@@ -41,8 +41,11 @@ public class Robot extends TimedRobot {
    PhotonCamera camera = new PhotonCamera("shooterCamera");
    XboxController xbox = new XboxController(0);
    Drivetrain driveTrain = new Drivetrain();
+   Intake intake = new Intake();
+   Shooter shooter = new Shooter();
    double storingAngle = 0;
    double storingSpeed = 0;
+   boolean ringRGB = false;
   public void robotInit()
   {
     leds = new AddressableLED(0);
@@ -80,6 +83,12 @@ public class Robot extends TimedRobot {
       thingy++;
       }
     }
+  public void setRGB(int red, int green, int blue) {
+  for (int i = 0; i < buffer.getLength(); i++) {
+      buffer.setRGB(i, red, green, blue);
+    }
+    leds.setData(buffer);
+  }
   public void rainbowHSV() {
     for (int i = 0; i < buffer.getLength(); i++) {
        buffer.setHSV(i, hues[testVar], 255, 255);
@@ -113,11 +122,12 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic()
   {
-    rainbowHSV();
     double x = -xbox.getLeftY();
     double y = -xbox.getLeftX();
     double x2 = -xbox.getRightX();
     boolean a = xbox.getAButtonPressed();
+    boolean b = xbox.getBButton();
+    boolean yXbox = xbox.getYButton();
     x2 = x2 * 6;
     x = x * 2;
     y = y * 2;
@@ -126,7 +136,7 @@ public class Robot extends TimedRobot {
       y = 0;
       x = 0;
     }
-    if(Math.sqrt(x2*x2) < 0.2) {
+    if(Math.sqrt(x2*x2) < 0.2) { 
       x2 = 0;
     }
     storingAngle = y;
@@ -135,17 +145,34 @@ public class Robot extends TimedRobot {
       driveTrain.zeroPigeon();
     }
     driveTrain.feildOrienteDrive(speed);
+    if (b) {
+      intake.getRing();
+    } else {
+      intake.stopMotor();
+    }
+    if (intake.hasRing() || ringRGB) {
+      double timeMod = timer.get() % 5;
+      setRGB(0,0,0);
+      if (timeMod < 3) {
+        setRGB(255,0,0);
+        ringRGB = true;
+      } else if (timeMod > 1 && timeMod < 3) {
+        ringRGB = true;
+      } else {
+        ringRGB = false;
+      }
+    } else {
+      rainbowHSV();
+    }
+    if (yXbox) {
+      shooter.shoot();
+    } else {
+      shooter.notShoot();
+    }
   }
   @Override
   public void disabledInit() {}
 
-
-  public void setRGB(int red, int green, int blue) {
-    for (int i = 0; i < buffer.getLength(); i++) {
-          buffer.setRGB(i, red, green, blue);
-    }
-    leds.setData(buffer);
-  }
   public void aLED() {
     for (int i = 0; i < buffer.getLength(); i++) {
        buffer.setRGB(i, red[testVar], green[testVar], blue[testVar]);

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -84,6 +85,7 @@ public class Swerve {
         driveKraken.setVoltage(volt);
     }
     public void drive(SwerveModuleState desiredState){
+        desiredState = SwerveModuleState.optimize(desiredState, Rotation2d.fromRotations(cancoder.getPosition().getValueAsDouble()));
         alignWheels(desiredState.angle.getRotations());
         spin(desiredState.speedMetersPerSecond);
     }
