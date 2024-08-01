@@ -27,7 +27,7 @@ public class Intake {
     public static final int intakeProximitySwitchIDRightBottom = 0;
     public static final int indexerProximitySwitchIDLeft = 3;
     public static final int indexerProximitySwitchIDRight = 1;
-    
+    boolean ringReady = false;
     public Intake() {
         intakeProximitySwitchLeftBottom = new DigitalInput(intakeProximitySwitchIDLeftBottom);
         intakeProximitySwitchRightBottom = new DigitalInput(intakeProximitySwitchIDRightBottom);
@@ -41,15 +41,20 @@ public class Intake {
         intakeKraken.getConfigurator().apply(talonConfig);
     }
     public void getRing(){
-        if (!intakeProximitySwitchLeft.get() || !intakeProximitySwitchRight.get()) {
+        if (!intakeProximitySwitchLeft.get() || !intakeProximitySwitchRight.get() || ringReady) {
             frontIntakeMotor.setVoltage(0);
             backIntakeMotor.setVoltage(0);
             intakeKraken.setVoltage(0);
+            ringReady = true;
         } else {
             frontIntakeMotor.setVoltage(8);
             backIntakeMotor.setVoltage(8);
             intakeKraken.setVoltage(8);
         }
+    }
+    public void shoot() {
+        intakeKraken.setVoltage(2);
+        ringReady = false;
     }
     public void stopMotor() {
         frontIntakeMotor.setVoltage(0);

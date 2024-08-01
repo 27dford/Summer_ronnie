@@ -15,14 +15,19 @@ public class Shooter {
         flyKrakenRight = new TalonFX(5, "*");
         talonConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         flyKrakenRight.getConfigurator().apply(talonConfig);
+
     }
     public void shoot() {
-        flyKrakenLeft.setVoltage(5);
-        flyKrakenRight.setVoltage(5);
+        
+        flyKrakenLeft.setVoltage(10);
+        flyKrakenRight.setVoltage(10);
 
     }
     public void notShoot() {
         flyKrakenLeft.setVoltage(0);
         flyKrakenRight.setVoltage(0);
+    }
+    public void moveArm(double input) {
+
     }
 }

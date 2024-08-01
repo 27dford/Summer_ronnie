@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
    Drivetrain driveTrain = new Drivetrain();
    Intake intake = new Intake();
    Shooter shooter = new Shooter();
+   Arm arm = new Arm();
    double storingAngle = 0;
    double storingSpeed = 0;
    boolean ringRGB = false;
@@ -127,7 +128,10 @@ public class Robot extends TimedRobot {
     double x2 = -xbox.getRightX();
     boolean a = xbox.getAButtonPressed();
     boolean b = xbox.getBButton();
+    boolean leftShoulder = xbox.getLeftBumper();
     boolean yXbox = xbox.getYButton();
+    double leftTrigger = xbox.getLeftTriggerAxis();
+    double rightTrigger = xbox.getRightTriggerAxis();
     x2 = x2 * 6;
     x = x * 2;
     y = y * 2;
@@ -147,17 +151,14 @@ public class Robot extends TimedRobot {
     driveTrain.feildOrienteDrive(speed);
     if (b) {
       intake.getRing();
-    } else {
+    } else if (!yXbox){
       intake.stopMotor();
     }
     if (intake.hasRing() || ringRGB) {
-      double timeMod = timer.get() % 5;
-      setRGB(0,0,0);
+      double 
+      timeMod = timer.get() % 5;
       if (timeMod < 3) {
         setRGB(255,0,0);
-        ringRGB = true;
-      } else if (timeMod > 1 && timeMod < 3) {
-        ringRGB = true;
       } else {
         ringRGB = false;
       }
@@ -168,6 +169,18 @@ public class Robot extends TimedRobot {
       shooter.shoot();
     } else {
       shooter.notShoot();
+    }
+    if (rightTrigger > 0.1) {
+      arm.moveArm(rightTrigger * 1.5);
+    } else if(leftTrigger > 0.1) {
+      arm.moveArm(-leftTrigger * 1.5);
+    } else {
+      arm.lockArm();
+    }
+    if (leftShoulder) {
+      intake.shoot();
+    } else if(!b){
+      // intake.stopMotor();
     }
   }
   @Override
