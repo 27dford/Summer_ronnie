@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -92,6 +93,21 @@ public class Swerve {
     public void getSpeed() {
         double speed = driveKraken.getVelocity().getValueAsDouble();
         SmartDashboard.putNumber("Rotations Per Second", speed);
+    }
+
+    public double getDistance() {
+        double driveMotorRotations = driveKraken.getPosition().getValueAsDouble();
+        double wheelRotationsPerMotorRotation = (16.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+        double driveWheelRotations = driveMotorRotations * wheelRotationsPerMotorRotation;
+
+        double radiusMeters = Units.inchesToMeters(2);
+        double circumference = 2 * Math.PI * radiusMeters;
+        double distanceMeters = driveWheelRotations * circumference;
+        return distanceMeters;
+    }
+
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(getDistance(), Rotation2d.fromRotations(cancoder.getPosition().getValueAsDouble()));
     }
 
 }

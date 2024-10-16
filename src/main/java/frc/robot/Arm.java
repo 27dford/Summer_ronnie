@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Arm {
     private CANSparkMax leftMotor;
     private CANSparkMax rightMotor;
@@ -41,19 +42,18 @@ public class Arm {
         leftMotor.setIdleMode(IdleMode.kBrake);
         leftMotor.burnFlash();
     }
-    public void moveArm(double input) {
-        if (cancoder.getPosition().getValueAsDouble() < -0.05 && input < 0) {
+    public void moveArm(double inputVolts) {
+        if ((cancoder.getPosition().getValueAsDouble() < -0.05 && inputVolts < 0) || (cancoder.getPosition().getValueAsDouble() >= 0.24 && inputVolts > 0)) {
             leftMotor.setVoltage(0);
             rightMotor.setVoltage(0);
         } else {
-            leftMotor.setVoltage(input);
-            rightMotor.setVoltage(input);
+            leftMotor.setVoltage(inputVolts);
+            rightMotor.setVoltage(inputVolts);
         }
     }
     public void stopMotor() {
         leftMotor.setVoltage(0);
         rightMotor.setVoltage(0);
-        System.out.println(cancoder.getPosition().getValueAsDouble());
     }
     public void lockArm() {
          if (cancoder.getPosition().getValueAsDouble() < -0.05) {
@@ -66,5 +66,22 @@ public class Arm {
             moveArm(voltsToLock);
         }
     }
-    
+    public double getArmPosition() {
+        double position = cancoder.getAbsolutePosition().getValueAsDouble();
+        return(position);
+    }
+    public boolean getToAngle(double desiredArmRotation) {
+        if((getArmPosition() < desiredArmRotation - 0.004) || (getArmPosition() > desiredArmRotation + 0.004)) {
+      double diffrenceInDistance = desiredArmRotation - getArmPosition();
+      double armVolts = diffrenceInDistance * 80;
+      moveArm(armVolts);
+      SmartDashboard.putNumber("Arm Volts", armVolts);
+      SmartDashboard.putNumber("Desired Arm", desiredArmRotation);
+      SmartDashboard.putNumber("Measured Arm", getArmPosition());
+      return false;
+    } else {
+        lockArm();
+        return true;
+    }
+    }
 }

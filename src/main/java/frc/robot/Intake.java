@@ -47,13 +47,13 @@ public class Intake {
             intakeKraken.setVoltage(0);
             ringReady = true;
         } else {
-            frontIntakeMotor.setVoltage(8);
-            backIntakeMotor.setVoltage(8);
-            intakeKraken.setVoltage(8);
+            frontIntakeMotor.setVoltage(3);
+            backIntakeMotor.setVoltage(3);
+            intakeKraken.setVoltage(3);
         }
     }
     public void shoot() {
-        intakeKraken.setVoltage(2);
+        intakeKraken.setVoltage(12);
         ringReady = false;
     }
     public void stopMotor() {
